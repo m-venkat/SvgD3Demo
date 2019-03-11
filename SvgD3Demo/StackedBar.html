@@ -53,6 +53,7 @@
         var stackPercentPerBar = "LevelStackBarPercent";
         var chartContainerOuterWidth = 1100;
         var chartContainerOuterHeight = 600;
+        var rocketCenterX = chartContainerOuterWidth / 2;
         var rocketBarWidth = 100;
         var rocketBarLeftX = (chartContainerOuterWidth / 2) - (rocketBarWidth / 2);
         var chartColumnWidth = chartContainerOuterWidth / 3;//Divide the chart area into three part
@@ -84,6 +85,18 @@
                 .attr("width", chartContainerOuterWidth)
                 .attr("height", chartContainerOuterHeight)
                 .attr("style", "background-color:#dcdcdc");
+
+            var rocketCone = svg.append("g");
+            var trianglePoints = (rocketCenterX+5).toString() +
+                ",0 " +
+                (rocketBarLeftX+10).toString() +
+                "," +
+                (chartContentMargin.top).toString() +
+                " " + (rocketBarLeftX + rocketBarWidth+10).toString() +
+                "," + (chartContentMargin.top).toString();
+            console.log("triangle Points :"+ trianglePoints);
+            rocketCone.append("polygon")
+                .attr("points",trianglePoints);
 
             var g = svg.append("g")
                 .attr("transform", "translate(" + chartContentMargin.left + "," + chartContentMargin.top + ")");
