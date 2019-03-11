@@ -2,56 +2,148 @@
 <html>
 <head>
     <script src="//cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js"></script>
-</head>
-<body>
-<script>
+    <style>
 
-    var stackPercentPerBar = "LevelMaxPercent";
-     
-    function render(data){
-
-        //Step 1 : We are getting the stacked Unit Properly
-        var stack = d3.layout.stack()
-            .y(function (d){
-                return d[stackPercentPerBar];
-            })
-            .values(function (d){
-                return [d];
-            });
-
-        var stacked = stack(data);
-
-        d3.select("body").append("pre")
-            .text(JSON.stringify(stacked, null, 2));
-    }
-
-    var data = [
-        {
-            LevelName: "Level 1",
-            Color: "Yellow",
-            LevelMaxPercent : 20
-        },
-        {
-            LevelName: "Level 2",
-            Color: "Green",
-            LevelMaxPercent: 20
-        },
-        {
-            LevelName: "Level 3",
-            Color: "Blue",
-            LevelMaxPercent: 20
-        },
-        {
-            LevelName: "Level 4",
-            Color: "Orange",
-            LevelMaxPercent: 20
-        },
-        {
-            LevelName: "Level 5",
-            Color: "Brown",
-            LevelMaxPercent: 20
+        .axis text {
+            font-size: .9em;
         }
-    ];
+
+        .axis line {
+            shape-rendering: crispEdges;
+            stroke: #000;
+            stroke-width: 2px;
+        }
+
+        /* Below, we set the tick length to 10px. The stroke-dasharray only displays 6px to create a minor tick effect. */
+        .axis .minor line {
+            stroke: #777;
+            stroke-width: 1px;
+            stroke-dasharray: 6,4;
+        }
+        .axis path, .axis line {
+            fill: none;
+            stroke: #000;
+            shape-rendering: crispEdges;
+        }
+        /* Below, we set the tick length to 10px. The stroke-dasharray only displays 6px to create a minor tick effect. 
+        /*.axis .minor line {
+            stroke: #777;
+            stroke-width: 1px;
+            stroke-dasharray: 6,4;
+        }*/
+    </style>
+    <script>
+        var ticks = [];
+        for (var i = 0; i <= 100; i += 2.5) {
+            ticks.push( { value: i, isVisible: i % 10 === 0 });
+        }
+        var tickValues = ticks.map(function (t) { return t.value; });
+        // Helper function, to check whether we are dealing with a major or minor tick.
+        // Minor ticks have the class 'minor' attached to them, and no text label.
+        var isMajorTick = function (index) {
+            return ticks[index].isVisible;
+        }
+        var stackPercentPerBar = "LevelStackBarPercent";
+        var chartContainerOuterWidth = 1100;
+        var chartContainerOuterHeight = 600;
+
+        var chartColumnWidth = chartContainerOuterWidth / 3;//Divide the chart area into three part
+
+        //One part for rocket, left nd right part for legend
+        //top 100 reserved for rocket head
+        //bottom for legend
+        var chartContentMargin = { left: 10, top: 100, right: 10, bottom: 40 };
+
+        var innerWidth = chartContainerOuterWidth - chartContentMargin.left - chartContentMargin.right;
+        var innerHeight = chartContainerOuterHeight - chartContentMargin.top - chartContentMargin.bottom;
+
+       
+        function render(data) {
+            
+            //Step 1 : We are getting the stacked Unit Properly
+            var stack = d3.layout.stack()
+                .y(function (d) {
+                    return d[stackPercentPerBar];
+                })
+                .values(function (d) {
+                    return [d];
+                });
+
+            var stacked = stack(data);
+            var svg = d3.select("#chartContainer").append("svg")
+                //.attr("width", "100%")
+                //.attr("height", "100vh")
+                .attr("width", chartContainerOuterWidth)
+                .attr("height", chartContainerOuterHeight)
+                .attr("style", "background-color:#dcdcdc");
+
+            var g = svg.append("g")
+                .attr("transform", "translate(" + chartContentMargin.left + "," + chartContentMargin.top + ")");
+            var yAxisG = g.append("g")
+                .attr("class", "y axis")
+                .attr("transform", "translate(" + chartContainerOuterWidth/2+",0)");
+
+            var yScale = d3.scale.linear().range([innerHeight, 0]);
+            var yAxis = d3.svg.axis().scale(yScale).orient("left")
+                .tickSize(10)
+                .tickPadding(5)
+                .tickValues(tickValues)
+                .tickFormat(function (d, i) {
+                    return isMajorTick(i) ? d : "";
+                });
+            yScale.domain([0, d3.max(stacked, function (d) { return d.y0 + d.y; })]);
+            yAxisG.call(yAxis);
+
+            // Add the class 'minor' to all minor ticks
+            yAxisG.selectAll("g")
+                .filter(function (d, i) {
+                    return !isMajorTick(i);
+                })
+                .classed("minor", true);
+            // var
+            // d3.select("body").append("pre").text(JSON.stringify(stacked, null, 2));
+        }
+        var data = [
+            {
+                LevelName: "Level 1",
+                Color: "Yellow",
+                LevelStackBarPercent: 20
+            },
+            {
+                LevelName: "Level 2",
+                Color: "Green",
+                LevelStackBarPercent: 20
+            },
+            {
+                LevelName: "Level 3",
+                Color: "Blue",
+                LevelStackBarPercent: 20
+            },
+            {
+                LevelName: "Level 4",
+                Color: "Orange",
+                LevelStackBarPercent: 20
+            },
+            {
+                LevelName: "Level 5",
+                Color: "Brown",
+                LevelStackBarPercent: 20
+            }
+        ];
+
+
+    </script>
+</head>
+<body >
+    <table align="center" style="width:80%; height: 100vh;border:1px solid black">
+        <tr>
+            <td align="center">Level</td>
+        </tr>
+        <tr>
+            <td ><div id="chartContainer" style="width: 100%;height:100%"></div></td>
+        </tr>
+    </table>
+<script>
     render(data);
 </script>
 </body>
