@@ -53,7 +53,8 @@
         var stackPercentPerBar = "LevelStackBarPercent";
         var chartContainerOuterWidth = 1100;
         var chartContainerOuterHeight = 600;
-
+        var rocketBarWidth = 100;
+        var rocketBarLeftX = (chartContainerOuterWidth / 2) - (rocketBarWidth / 2);
         var chartColumnWidth = chartContainerOuterWidth / 3;//Divide the chart area into three part
 
         //One part for rocket, left nd right part for legend
@@ -88,7 +89,7 @@
                 .attr("transform", "translate(" + chartContentMargin.left + "," + chartContentMargin.top + ")");
             var yAxisG = g.append("g")
                 .attr("class", "y axis")
-                .attr("transform", "translate(" + chartContainerOuterWidth/2+",0)");
+                .attr("transform", "translate(" + rocketBarLeftX+",0)");
 
            // var xScale = d3.scale.ordinal().rangeBands([0, innerWidth], 0.2);
             var yScale = d3.scale.linear().range([innerHeight, 0]);
@@ -114,14 +115,17 @@
             //Draw the Bar Stacked
             var bars = g.selectAll("rect").data(stacked);
             bars.enter().append("rect")
-                .attr("width", "200px");
+                .attr("width", rocketBarWidth);
             bars
                 //.attr("x", function (d) { return xScale(d[xColumn]); })
-                .attr("x", chartContainerOuterWidth / 2)
+                .attr("x", rocketBarLeftX)
                 .attr("y", function (d){ return yScale(d.y0 + d.y); })
                 .attr("height", function (d) { return innerHeight - yScale(d.y); })
-                .attr("fill", function (d) {return getColor(d); });
-                //.attr("fill", function (d){ return colorScale(d[colorColumn]); });
+                .attr("stroke", "black")
+                .attr("stroke-width", "1px")
+                .attr("fill", function (d) { return getColor(d); });
+
+          
             bars.exit().remove();
         
         }
@@ -129,28 +133,24 @@
             {
                 LevelName: "Level 1",
                 Color: "Yellow",
-                LevelStackBarPercent: 20
+                LevelStackBarPercent: 25
             },
             {
                 LevelName: "Level 2",
                 Color: "Green",
-                LevelStackBarPercent: 20
+                LevelStackBarPercent: 25
             },
             {
                 LevelName: "Level 3",
                 Color: "Blue",
-                LevelStackBarPercent: 20
+                LevelStackBarPercent: 25
             },
             {
                 LevelName: "Level 4",
                 Color: "Orange",
-                LevelStackBarPercent: 20
-            },
-            {
-                LevelName: "Level 5",
-                Color: "Brown",
-                LevelStackBarPercent: 20
+                LevelStackBarPercent: 25
             }
+           
         ];
 
 
