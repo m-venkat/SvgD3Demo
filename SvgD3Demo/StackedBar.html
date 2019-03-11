@@ -33,6 +33,7 @@
         }*/
     </style>
     <script>
+        var currentMark = 45;
         var ticks = [];
         for (var i = 0; i <= 100; i += 2.5) {
             ticks.push( { value: i, isVisible: i % 10 === 0 });
@@ -42,6 +43,15 @@
         // Minor ticks have the class 'minor' attached to them, and no text label.
         var isMajorTick = function (index) {
             return ticks[index].isVisible;
+        }
+        var lastData = null;
+        var lastDirection = "L";
+        var getLineCoordinates = function(data) {
+            if (lastData == null)
+                lastData = data;
+
+
+
         }
 
         var getColor = function (data) {
@@ -87,7 +97,8 @@
                 .attr("style", "background-color:#dcdcdc");
 
             var rocketCone = svg.append("g");
-            var trianglePoints = (rocketCenterX+5).toString() +
+            //prepare triangel coordinates
+            var trianglePoints = (rocketCenterX + 5).toString() +
                 ",0 " +
                 (rocketBarLeftX+10).toString() +
                 "," +
@@ -104,7 +115,7 @@
                 .attr("class", "y axis")
                 .attr("transform", "translate(" + rocketBarLeftX+",0)");
 
-           // var xScale = d3.scale.ordinal().rangeBands([0, innerWidth], 0.2);
+            // var xScale = d3.scale.ordinal().rangeBands([0, innerWidth], 0.2);
             var yScale = d3.scale.linear().range([innerHeight, 0]);
             var yAxis = d3.svg.axis().scale(yScale).orient("left")
                 .tickSize(10)
@@ -138,30 +149,91 @@
                 .attr("stroke-width", "1px")
                 .attr("fill", function (d) { return getColor(d); });
 
-          
+            bars.enter().append("line"); //Left Line Legend
+            bars
+                .attr("x1",rocketBarLeftX - 150)
+                .attr("y1", function (d) { return yScale(d.y0 + d.y); })
+                .attr("x2",rocketBarLeftX - 50)
+                .attr("y2", function (d){ return yScale(d.y0 + d.y); })
+                .attr("stroke", "black")
+                .attr("stroke-width", "1px")
+                .attr("stroke-dasharray", "4");
+
+            bars.enter().append("line");//Right Line Legend
+            bars
+                .attr("x1", rocketBarLeftX + 120)
+                .attr("y1", function (d) { return yScale(d.y0 + d.y); })
+                .attr("x2", rocketBarLeftX + 120+ 100)
+                .attr("y2", function (d) { return yScale(d.y0 + d.y); })
+                .attr("stroke", "black")
+                .attr("stroke-width", "1px")
+                .attr("stroke-dasharray", "4");
+
+            bars.enter().append("line");
+            bars
+                .attr("x1", rocketBarLeftX + 120)
+                .attr("y1", function (d) { return yScale(d.y0 + d.y); })
+                .attr("x2", rocketBarLeftX + 120 + 100)
+                .attr("y2", function (d) { return yScale(d.y0 + d.y); })
+                .attr("stroke", "black")
+                .attr("stroke-width", "1px")
+                .attr("stroke-dasharray", "4");
             bars.exit().remove();
-        
+            //Set Point to current Mark
+            //var marker = svg.append("rect")
+            //    .attr("x", rocketBarLeftX+30)
+            //    .attr("y", yScale(65-22))
+            //    .attr("width",rocketBarWidth-20)
+            //    .attr("height", "5px")
+            //    .attr("stroke", "black")
+            //    .attr("stroke-width", "1px")
+            //    .attr("fill", "black");
+
+            //var pointerPoints = (rocketBarLeftX + 30).toString() +
+            //    "," + yScale(65 - 22)+" "+
+            //    (rocketBarLeftX+50).toString() +
+            //    "," +
+            //    (yScale(65 - 42)).toString() +
+            //    " " + (rocketBarLeftX + rocketBarWidth+10).toString() +
+            //    "," + (chartContentMargin.top).toString();
+            var marker = svg.append("rect")
+                .attr("x", rocketBarLeftX + 30)
+                .attr("y", yScale(currentMark - 22))
+                .attr("width", rocketBarWidth - 20)
+                .attr("height", "7px")
+                .attr("stroke", "red")
+                .attr("stroke-width", "1px")
+                .attr("fill", "maroon");
+
+           
+
+
         }
         var data = [
             {
                 LevelName: "Level 1",
                 Color: "Yellow",
-                LevelStackBarPercent: 25
+                LevelStackBarPercent: 20
             },
             {
                 LevelName: "Level 2",
                 Color: "Green",
-                LevelStackBarPercent: 25
+                LevelStackBarPercent: 20
             },
             {
                 LevelName: "Level 3",
                 Color: "Blue",
-                LevelStackBarPercent: 25
+                LevelStackBarPercent: 20
             },
             {
                 LevelName: "Level 4",
                 Color: "Orange",
-                LevelStackBarPercent: 25
+                LevelStackBarPercent: 20
+            },
+            {
+                LevelName: "Level 5",
+                Color: "teal",
+                LevelStackBarPercent: 20
             }
            
         ];
