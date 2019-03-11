@@ -67,6 +67,12 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="BackupChart.html" />
+    <Content Include="BarBasic.html" />
+    <Content Include="HtmlPage1.html" />
+    <Content Include="StackedBar.html" />
+    <Content Include="ThermoMeter.html" />
+    <Content Include="ThermoMeterBackup.html" />
     <Content Include="Web.config" />
   </ItemGroup>
   <ItemGroup>

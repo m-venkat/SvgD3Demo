@@ -1,0 +1,151 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>D3 Example</title>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js"></script>
+
+</head>
+<body>
+    <!--<script>
+        var chartCanvasWidth = 900;
+        var chartCanvasHeight = 600;
+        var rocketBarWidth = 100;
+        const yAxisStart = 570;
+        var data = [
+            "Level 1",
+            "Level 2",
+            "Level 3",
+            "Level 4",
+            "Level 5"
+        ];
+
+        //This scale is to get the pixel translation
+        var levelTextScale = d3.scale.ordinal()
+            .domain(data)   // Data space
+            .range(data); // Pixel space
+
+        //This scale is to get the pixel translation
+        var scale = d3.scale.linear()
+            .domain([1, data.length])   // Data space
+            .range([0, 200]); // Pixel space
+
+        var svg = d3.select("body").append("svg")
+            .attr("width", chartCanvasWidth)
+            .attr("height", chartCanvasHeight)
+            .attr("style", "background-color:#dcdcdc");
+
+        svg.selectAll("rect")
+            .data(levelTextScale)
+            .enter().append("rect")
+            .attr("y", yAxisStart)
+            //centering X Axis in mid of SVG Container
+            .attr("x", (chartCanvasWidth/2)- (rocketBarWidth/2))
+            .attr("width", rocketBarWidth)
+            .attr("height", 20);
+
+    </script>-->
+    <!--<script>
+
+        var data = [2, 4, 5, 7, 8];
+
+        var scale = d3.scale.linear()
+            .domain([1, 5])   // Data space
+            .range([0, 200]); // Pixel space
+
+        var svg = d3.select("body").append("svg")
+            .attr("width", 250)
+            .attr("height", 250);
+
+        svg.selectAll("rect")
+            .data(data)
+            .enter().append("rect")
+            .attr("x", function (d) { return scale(d); })
+            .attr("y", 50)
+            .attr("width", 20)
+            .attr("height", 20);
+
+    </script>-->
+    <script>
+
+        var outerWidth = 500;
+        var outerHeight = 250;
+        var margin = { left: 90, top: 30, right: 30, bottom: 30 };
+
+        var xColumn = "name";
+        var yColumn = "population";
+
+        var innerWidth = outerWidth - margin.left - margin.right;
+        var innerHeight = outerHeight - margin.top - margin.bottom;
+
+        var svg = d3.select("body").append("svg")
+            .attr("width", outerWidth)
+            .attr("height", outerHeight)
+            .attr("style", "background-color:#dcdcdc");
+
+        var g = svg.append("g")
+            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+        var xScale = d3.scale.ordinal().rangeBands([0, innerWidth]);
+        var yScale = d3.scale.linear().range([innerHeight, 0]);
+
+        function render(data) {
+
+
+            //map translates one object array into another form.  Here it returns country names as
+            //a single Array
+            xScale.domain(data.map(function (d) { return d[xColumn]; }));
+            yScale.domain([0, d3.max(data, function (d) { return d[yColumn]; })]);
+
+            var bars = g.selectAll("rect").data(data);
+            bars.enter().append("rect");
+
+            // Correction: the value for xScale.rangeBand()
+            // DOES depend on the data, so it should go in the update phase, not the enter phase.
+            bars
+                .attr("x", function (d) { return xScale(d[xColumn]); })
+                .attr("y", function (d) { return yScale(d[yColumn]); })
+                .attr("width", xScale.rangeBand())
+                .attr("height", function (d) { return innerHeight - yScale(d[yColumn]); });
+            bars.exit().remove();
+        }
+
+        function type(d) {
+            d.population = +d.population;
+            return d;
+        }
+        data = [
+            {
+                name: "Chennai",
+                population: 10000
+            },
+            {
+                name: "Delhi",
+                population: 20000
+            },
+            {
+                name: "Bangalore",
+                population: 34343
+            },
+            {
+                name: "Pune",
+                population: 10000
+            },
+            {
+                name: "Mumbai",
+                population: 20000
+            },
+            {
+                name: "Cochin",
+                population: 30000
+            }
+
+        ];
+        render(data);
+        //data.forEach(function (d) {
+        //    render(d);
+        //});
+
+    </script>
+</body>
+</html>

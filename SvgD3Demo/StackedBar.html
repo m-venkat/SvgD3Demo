@@ -1,0 +1,58 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js"></script>
+</head>
+<body>
+<script>
+
+    var stackPercentPerBar = "LevelMaxPercent";
+     
+    function render(data){
+
+        //Step 1 : We are getting the stacked Unit Properly
+        var stack = d3.layout.stack()
+            .y(function (d){
+                return d[stackPercentPerBar];
+            })
+            .values(function (d){
+                return [d];
+            });
+
+        var stacked = stack(data);
+
+        d3.select("body").append("pre")
+            .text(JSON.stringify(stacked, null, 2));
+    }
+
+    var data = [
+        {
+            LevelName: "Level 1",
+            Color: "Yellow",
+            LevelMaxPercent : 20
+        },
+        {
+            LevelName: "Level 2",
+            Color: "Green",
+            LevelMaxPercent: 20
+        },
+        {
+            LevelName: "Level 3",
+            Color: "Blue",
+            LevelMaxPercent: 20
+        },
+        {
+            LevelName: "Level 4",
+            Color: "Orange",
+            LevelMaxPercent: 20
+        },
+        {
+            LevelName: "Level 5",
+            Color: "Brown",
+            LevelMaxPercent: 20
+        }
+    ];
+    render(data);
+</script>
+</body>
+</html>
