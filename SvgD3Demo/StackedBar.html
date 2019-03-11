@@ -32,214 +32,238 @@
             stroke-dasharray: 6,4;
         }*/
     </style>
-    <script>
-        var currentMark = 45;
-        var ticks = [];
-        for (var i = 0; i <= 100; i += 2.5) {
-            ticks.push( { value: i, isVisible: i % 10 === 0 });
-        }
-        var tickValues = ticks.map(function (t) { return t.value; });
-        // Helper function, to check whether we are dealing with a major or minor tick.
-        // Minor ticks have the class 'minor' attached to them, and no text label.
-        var isMajorTick = function (index) {
-            return ticks[index].isVisible;
-        }
-        var lastData = null;
-        var lastDirection = "L";
-        var getLineCoordinates = function(data) {
-            if (lastData == null)
-                lastData = data;
+<script>
+    function wordwrap(text, max) {
+        var regex = new RegExp(".{0,"+max+"}(?:\\s|$)","g");
+        var lines = [];
 
-
-
+        var line;
+        while ((line = regex.exec(text)) != "") {
+            lines.push(line);
         }
 
-        var getColor = function (data) {
-            console.log(data);
-            console.log("Get Color function :", data);
-            console.log("Color (data.Color) :", data.Color);
-            return data.Color;
-        }
-        var stackPercentPerBar = "LevelStackBarPercent";
-        var chartContainerOuterWidth = 1100;
-        var chartContainerOuterHeight = 600;
-        var rocketCenterX = chartContainerOuterWidth / 2;
-        var rocketBarWidth = 100;
-        var rocketBarLeftX = (chartContainerOuterWidth / 2) - (rocketBarWidth / 2);
-        var chartColumnWidth = chartContainerOuterWidth / 3;//Divide the chart area into three part
+        return lines;
+    }
+    var currentMark = 45;
+    var ticks = [];
+    for (var i = 0; i <= 100; i += 2.5) {
+        ticks.push( { value: i, isVisible: i % 10 === 0 });
+    }
+    var tickValues = ticks.map(function (t) { return t.value; });
+    // Helper function, to check whether we are dealing with a major or minor tick.
+    // Minor ticks have the class 'minor' attached to them, and no text label.
+    var isMajorTick = function (index) {
+        return ticks[index].isVisible;
+    }
+    var lastData = null;
+    var lastDirection = "L";
+    var getLineCoordinates = function(data) {
+        if (lastData == null)
+            lastData = data;
 
-        //One part for rocket, left nd right part for legend
-        //top 100 reserved for rocket head
-        //bottom for legend
-        var chartContentMargin = { left: 10, top: 100, right: 10, bottom: 40 };
 
-        var innerWidth = chartContainerOuterWidth - chartContentMargin.left - chartContentMargin.right;
-        var innerHeight = chartContainerOuterHeight - chartContentMargin.top - chartContentMargin.bottom;
+
+    }
+
+    var getColor = function (data) {
+        console.log(data);
+        console.log("Get Color function :", data);
+        console.log("Color (data.Color) :", data.Color);
+        return data.Color;
+    }
+    var stackPercentPerBar = "LevelStackBarPercent";
+    var chartContainerOuterWidth = 1100;
+    var chartContainerOuterHeight = 600;
+    var rocketCenterX = chartContainerOuterWidth / 2;
+    var rocketBarWidth = 100;
+    var rocketBarLeftX = (chartContainerOuterWidth / 2) - (rocketBarWidth / 2);
+    var chartColumnWidth = chartContainerOuterWidth / 3;//Divide the chart area into three part
+
+    //One part for rocket, left nd right part for legend
+    //top 100 reserved for rocket head
+    //bottom for legend
+    var chartContentMargin = { left: 10, top: 100, right: 10, bottom: 40 };
+
+    var innerWidth = chartContainerOuterWidth - chartContentMargin.left - chartContentMargin.right;
+    var innerHeight = chartContainerOuterHeight - chartContentMargin.top - chartContentMargin.bottom;
 
        
-        function render(data) {
+    function render(data) {
             
-            //Step 1 : We are getting the stacked Unit Properly
-            var stack = d3.layout.stack()
-                .y(function (d) {
-                    return d[stackPercentPerBar];
-                })
-                .values(function (d) {
-                    return [d];
-                });
+        //Step 1 : We are getting the stacked Unit Properly
+        var stack = d3.layout.stack()
+            .y(function (d) {
+                return d[stackPercentPerBar];
+            })
+            .values(function (d) {
+                return [d];
+            });
 
-            var stacked = stack(data);
-            var svg = d3.select("#chartContainer").append("svg")
-                //.attr("width", "100%")
-                //.attr("height", "100vh")
-                .attr("width", chartContainerOuterWidth)
-                .attr("height", chartContainerOuterHeight)
-                .attr("style", "background-color:#dcdcdc");
+        var stacked = stack(data);
+        var svg = d3.select("#chartContainer").append("svg")
+            //.attr("width", "100%")
+            //.attr("height", "100vh")
+            .attr("width", chartContainerOuterWidth)
+            .attr("height", chartContainerOuterHeight)
+            .attr("style", "background-color:#dcdcdc");
 
-            var rocketCone = svg.append("g");
-            //prepare triangel coordinates
-            var trianglePoints = (rocketCenterX + 5).toString() +
-                ",0 " +
-                (rocketBarLeftX+10).toString() +
-                "," +
-                (chartContentMargin.top).toString() +
-                " " + (rocketBarLeftX + rocketBarWidth+10).toString() +
-                "," + (chartContentMargin.top).toString();
-            console.log("triangle Points :"+ trianglePoints);
-            rocketCone.append("polygon")
-                .attr("points",trianglePoints);
+        var rocketCone = svg.append("g");
+        //prepare triangel coordinates
+        var trianglePoints = (rocketCenterX + 5).toString() +
+            ",0 " +
+            (rocketBarLeftX+10).toString() +
+            "," +
+            (chartContentMargin.top).toString() +
+            " " + (rocketBarLeftX + rocketBarWidth+10).toString() +
+            "," + (chartContentMargin.top).toString();
+        console.log("triangle Points :"+ trianglePoints);
+        rocketCone.append("polygon")
+            .attr("points",trianglePoints);
 
-            var g = svg.append("g")
-                .attr("transform", "translate(" + chartContentMargin.left + "," + chartContentMargin.top + ")");
-            var yAxisG = g.append("g")
-                .attr("class", "y axis")
-                .attr("transform", "translate(" + rocketBarLeftX+",0)");
+        var g = svg.append("g")
+            .attr("transform", "translate(" + chartContentMargin.left + "," + chartContentMargin.top + ")");
+        var yAxisG = g.append("g")
+            .attr("class", "y axis")
+            .attr("transform", "translate(" + rocketBarLeftX+",0)");
 
-            // var xScale = d3.scale.ordinal().rangeBands([0, innerWidth], 0.2);
-            var yScale = d3.scale.linear().range([innerHeight, 0]);
-            var yAxis = d3.svg.axis().scale(yScale).orient("left")
-                .tickSize(10)
-                .tickPadding(5)
-                .tickValues(tickValues)
-                .tickFormat(function (d, i) {
-                    return isMajorTick(i) ? d : "";
-                });
-            yScale.domain([0, d3.max(stacked, function (d) { return d.y0 + d.y; })]);
-            yAxisG.call(yAxis);
+        // var xScale = d3.scale.ordinal().rangeBands([0, innerWidth], 0.2);
+        var yScale = d3.scale.linear().range([innerHeight, 0]);
+        var yAxis = d3.svg.axis().scale(yScale).orient("left")
+            .tickSize(10)
+            .tickPadding(5)
+            .tickValues(tickValues)
+            .tickFormat(function (d, i) {
+                return isMajorTick(i) ? d : "";
+            });
+        yScale.domain([0, d3.max(stacked, function (d) { return d.y0 + d.y; })]);
+        yAxisG.call(yAxis);
 
-            // Add the class 'minor' to all minor ticks
-            yAxisG.selectAll("g")
-                .filter(function (d, i) {
-                    return !isMajorTick(i);
-                })
-                .classed("minor", true);
-            // var
-            // d3.select("body").append("pre").text(JSON.stringify(stacked, null, 2));
+        // Add the class 'minor' to all minor ticks
+        yAxisG.selectAll("g")
+            .filter(function (d, i) {
+                return !isMajorTick(i);
+            })
+            .classed("minor", true);
+        // var
+        // d3.select("body").append("pre").text(JSON.stringify(stacked, null, 2));
 
-            //Draw the Bar Stacked
-            var bars = g.selectAll("rect").data(stacked);
-            bars.enter().append("rect")
-                .attr("width", rocketBarWidth);
-            bars
-                //.attr("x", function (d) { return xScale(d[xColumn]); })
-                .attr("x", rocketBarLeftX)
-                .attr("y", function (d){ return yScale(d.y0 + d.y); })
-                .attr("height", function (d) { return innerHeight - yScale(d.y); })
-                .attr("stroke", "black")
-                .attr("stroke-width", "1px")
-                .attr("fill", function (d) { return getColor(d); });
+        //Draw the Bar Stacked
+        var bars = g.selectAll("rect").data(stacked);
+        bars.enter().append("rect")
+            .attr("width", rocketBarWidth);
+        bars
+            //.attr("x", function (d) { return xScale(d[xColumn]); })
+            .attr("x", rocketBarLeftX)
+            .attr("y", function (d){ return yScale(d.y0 + d.y); })
+            .attr("height", function (d) { return innerHeight - yScale(d.y); })
+            .attr("stroke", "black")
+            .attr("stroke-width", "1px")
+            .attr("fill", function (d) { return getColor(d); });
 
-            bars.enter().append("line"); //Left Line Legend
-            bars
-                .attr("x1",rocketBarLeftX - 150)
-                .attr("y1", function (d) { return yScale(d.y0 + d.y); })
-                .attr("x2",rocketBarLeftX - 50)
-                .attr("y2", function (d){ return yScale(d.y0 + d.y); })
-                .attr("stroke", "black")
-                .attr("stroke-width", "1px")
-                .attr("stroke-dasharray", "4");
+        bars.enter().append("line"); //Left Line Legend
+        bars
+            .attr("x1",rocketBarLeftX - 150)
+            .attr("y1", function (d) { return yScale(d.y0 + d.y); })
+            .attr("x2",rocketBarLeftX - 50)
+            .attr("y2", function (d){ return yScale(d.y0 + d.y); })
+            .attr("stroke", "black")
+            .attr("stroke-width", "1px")
+            .attr("stroke-dasharray", "4");
 
-            bars.enter().append("line");//Right Line Legend
-            bars
-                .attr("x1", rocketBarLeftX + 120)
-                .attr("y1", function (d) { return yScale(d.y0 + d.y); })
-                .attr("x2", rocketBarLeftX + 120+ 100)
-                .attr("y2", function (d) { return yScale(d.y0 + d.y); })
-                .attr("stroke", "black")
-                .attr("stroke-width", "1px")
-                .attr("stroke-dasharray", "4");
+        bars.enter().append("line");//Right Line Legend
+        bars
+            .attr("x1", rocketBarLeftX + 120)
+            .attr("y1", function (d) { return yScale(d.y0 + d.y); })
+            .attr("x2", rocketBarLeftX + 120+ 100)
+            .attr("y2", function (d) { return yScale(d.y0 + d.y); })
+            .attr("stroke", "black")
+            .attr("stroke-width", "1px")
+            .attr("stroke-dasharray", "4");
 
-            bars.enter().append("line");
-            bars
-                .attr("x1", rocketBarLeftX + 120)
-                .attr("y1", function (d) { return yScale(d.y0 + d.y); })
-                .attr("x2", rocketBarLeftX + 120 + 100)
-                .attr("y2", function (d) { return yScale(d.y0 + d.y); })
-                .attr("stroke", "black")
-                .attr("stroke-width", "1px")
-                .attr("stroke-dasharray", "4");
-            bars.exit().remove();
-            //Set Point to current Mark
-            //var marker = svg.append("rect")
-            //    .attr("x", rocketBarLeftX+30)
-            //    .attr("y", yScale(65-22))
-            //    .attr("width",rocketBarWidth-20)
-            //    .attr("height", "5px")
-            //    .attr("stroke", "black")
-            //    .attr("stroke-width", "1px")
-            //    .attr("fill", "black");
+        bars.enter().append("text");
+        bars
+            .attr("x", rocketBarLeftX + 120)
+            .attr("y", function (d) { return yScale(d.y0 + (d.y / 2)); })
+            .attr("text-anchor", "middle")
+            .each(function (d) {
+                var lines = wordwrap(d.LevelName, 50)
+                for (var i = 0; i < lines.length; i++) {
+                    d3.select(this).append("tspan").attr("dy", 13).attr("x", rocketBarLeftX + 120).text(lines[i])
+                }
+            });
+           // .text( function(d) { return d.LevelName; });
+        bars.exit().remove();
 
-            //var pointerPoints = (rocketBarLeftX + 30).toString() +
-            //    "," + yScale(65 - 22)+" "+
-            //    (rocketBarLeftX+50).toString() +
-            //    "," +
-            //    (yScale(65 - 42)).toString() +
-            //    " " + (rocketBarLeftX + rocketBarWidth+10).toString() +
-            //    "," + (chartContentMargin.top).toString();
-            var marker = svg.append("rect")
-                .attr("x", rocketBarLeftX + 30)
-                .attr("y", yScale(currentMark - 22))
-                .attr("width", rocketBarWidth - 20)
-                .attr("height", "7px")
-                .attr("stroke", "red")
-                .attr("stroke-width", "1px")
-                .attr("fill", "maroon");
+        //bars.append("foreignObject")
+        //    .attr("x", rocketBarLeftX + 120) /*the position of the text (left to right)*/
+        //    .attr("y", function (d) { return yScale(d.y0 + (d.y / 2)); }) /*the position of the text (Up and Down)*/
+        //    .attr("width", 350)
+        //    .attr("height", 200)
+        //  //  .append("xhtml:body")
+        //    .append("p")
+        //    .text(function(d) { return d.levelName; });
+
+        //Set Point to current Mark
+        //var marker = svg.append("rect")
+        //    .attr("x", rocketBarLeftX+30)
+        //    .attr("y", yScale(65-22))
+        //    .attr("width",rocketBarWidth-20)
+        //    .attr("height", "5px")
+        //    .attr("stroke", "black")
+        //    .attr("stroke-width", "1px")
+        //    .attr("fill", "black");
+
+        //var pointerPoints = (rocketBarLeftX + 30).toString() +
+        //    "," + yScale(65 - 22)+" "+
+        //    (rocketBarLeftX+50).toString() +
+        //    "," +
+        //    (yScale(65 - 42)).toString() +
+        //    " " + (rocketBarLeftX + rocketBarWidth+10).toString() +
+        //    "," + (chartContentMargin.top).toString();
+        var marker = svg.append("rect")
+            .attr("x", rocketBarLeftX + 30)
+            .attr("y", yScale(currentMark - 22))
+            .attr("width", rocketBarWidth - 20)
+            .attr("height", "7px")
+            .attr("stroke", "red")
+            .attr("stroke-width", "1px")
+            .attr("fill", "maroon");
 
            
 
 
+    }
+    var data = [
+        {
+            LevelName: "A Big paragraph to check how the wrapping works, A Big paragraph to check how the wrapping works, A Big paragraph to check how the wrapping works,  ",
+            Color: "Yellow",
+            LevelStackBarPercent: 20
+        },
+        {
+            LevelName: "Level 2",
+            Color: "Green",
+            LevelStackBarPercent: 20
+        },
+        {
+            LevelName: "Level 3",
+            Color: "Blue",
+            LevelStackBarPercent: 20
+        },
+        {
+            LevelName: "Level 4",
+            Color: "Orange",
+            LevelStackBarPercent: 20
+        },
+        {
+            LevelName: "Level 5",
+            Color: "teal",
+            LevelStackBarPercent: 20
         }
-        var data = [
-            {
-                LevelName: "Level 1",
-                Color: "Yellow",
-                LevelStackBarPercent: 20
-            },
-            {
-                LevelName: "Level 2",
-                Color: "Green",
-                LevelStackBarPercent: 20
-            },
-            {
-                LevelName: "Level 3",
-                Color: "Blue",
-                LevelStackBarPercent: 20
-            },
-            {
-                LevelName: "Level 4",
-                Color: "Orange",
-                LevelStackBarPercent: 20
-            },
-            {
-                LevelName: "Level 5",
-                Color: "teal",
-                LevelStackBarPercent: 20
-            }
            
-        ];
+    ];
 
 
-    </script>
+</script>
 </head>
 <body >
     <table align="center" style="width:80%; height: 100vh;border:1px solid black">
