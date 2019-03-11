@@ -43,6 +43,13 @@
         var isMajorTick = function (index) {
             return ticks[index].isVisible;
         }
+
+        var getColor = function (data) {
+            console.log(data);
+            console.log("Get Color function :", data);
+            console.log("Color (data.Color) :", data.Color);
+            return data.Color;
+        }
         var stackPercentPerBar = "LevelStackBarPercent";
         var chartContainerOuterWidth = 1100;
         var chartContainerOuterHeight = 600;
@@ -83,6 +90,7 @@
                 .attr("class", "y axis")
                 .attr("transform", "translate(" + chartContainerOuterWidth/2+",0)");
 
+           // var xScale = d3.scale.ordinal().rangeBands([0, innerWidth], 0.2);
             var yScale = d3.scale.linear().range([innerHeight, 0]);
             var yAxis = d3.svg.axis().scale(yScale).orient("left")
                 .tickSize(10)
@@ -102,6 +110,20 @@
                 .classed("minor", true);
             // var
             // d3.select("body").append("pre").text(JSON.stringify(stacked, null, 2));
+
+            //Draw the Bar Stacked
+            var bars = g.selectAll("rect").data(stacked);
+            bars.enter().append("rect")
+                .attr("width", "200px");
+            bars
+                //.attr("x", function (d) { return xScale(d[xColumn]); })
+                .attr("x", chartContainerOuterWidth / 2)
+                .attr("y", function (d){ return yScale(d.y0 + d.y); })
+                .attr("height", function (d) { return innerHeight - yScale(d.y); })
+                .attr("fill", function (d) {return getColor(d); });
+                //.attr("fill", function (d){ return colorScale(d[colorColumn]); });
+            bars.exit().remove();
+        
         }
         var data = [
             {
